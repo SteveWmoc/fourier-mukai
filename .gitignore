@@ -1,1 +1,5 @@
-/.lake
+/.lake/
+/lake-packages/
+/build/
+/.lean_cache/
+/.elan/
