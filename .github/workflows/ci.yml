@@ -2,22 +2,34 @@ name: Lean CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Lean
-        uses: leanprover/lean-action@v1
-        with:
-          toolchain: nightly-2024-06-16  # match your `lean-toolchain` file
+    - name: Install elan
+      run: |
+        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | bash -s -- -y
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
-      - name: Build project
-        run: |
-          lake build
+    - name: Set Lean toolchain
+      run: |
+        elan toolchain install leanprover/lean4:v4.20.1
+        elan default leanprover/lean4:v4.20.1
+
+    - name: Update dependencies
+      run: lake update
+
+    - name: Fetch cache
+      run: lake exe cache get || true
+
+    - name: Build project
+      run: lake build
