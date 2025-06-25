@@ -1,35 +1,243 @@
-name: Lean CI
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
+  # Allow manual triggering
   workflow_dispatch:
+
+# Cancel previous runs when new commits are pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v4
-
+      
     - name: Install elan
       run: |
-        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | bash -s -- -y
+        set -o pipefail
+        curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        ./elan-init -y --default-toolchain none
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
-
-    - name: Set Lean toolchain
+        
+    - name: Get Lean version
       run: |
-        elan toolchain install leanprover/lean4:v4.20.1
-        elan default leanprover/lean4:v4.20.1
-
-    - name: Update dependencies
+        echo "LEAN_VERSION=$(cat lean-toolchain)" >> $GITHUB_ENV
+        echo "Using Lean version: $(cat lean-toolchain)"
+        
+    - name: Cache Lean dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.elan
+          .lake
+        key: ${{ runner.os }}-lean-${{ env.LEAN_VERSION }}-${{ hashFiles('lakefile.lean', 'lake-manifest.json') }}
+        restore-keys: |
+          ${{ runner.os }}-lean-${{ env.LEAN_VERSION }}-
+          ${{ runner.os }}-lean-
+          
+    - name: Update Lake dependencies
       run: lake update
-
-    - name: Fetch cache
-      run: lake exe cache get || true
-
+      
+    - name: Get mathlib4 cache
+      run: |
+        # Try to get cache, but don't fail if it's not available
+        lake exe cache get || echo "Cache not available, will build from source"
+        
     - name: Build project
       run: lake build
+      
+    - name: Run tests (if any)
+      run: |
+        # Check if test directory exists
+        if [ -d "test" ]; then
+          echo "Running tests..."
+          lake build test
+        else
+          echo "No tests found, skipping test execution"
+        fi
+        
+    - name: Check for sorry's in main files
+      run: |
+        # Fail if sorry's are found in main source files (not in test or example files)
+        if find FourierMukai -name "*.lean" -exec grep -l "sorry" {} \; | grep -v -E "(test|example)" | head -1; then
+          echo "❌ Found sorry's in main source files:"
+          find FourierMukai -name "*.lean" -exec grep -l "sorry" {} \; | grep -v -E "(test|example)"
+          echo "Please resolve all sorry's before merging to main branch"
+          exit 1
+        else
+          echo "✅ No sorry's found in main source files"
+        fi
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install elan
+      run: |
+        set -o pipefail
+        curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        ./elan-init -y --default-toolchain none
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
+        
+    - name: Get Lean version
+      run: |
+        echo "LEAN_VERSION=$(cat lean-toolchain)" >> $GITHUB_ENV
+        
+    - name: Cache Lean dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.elan
+          .lake
+        key: ${{ runner.os }}-lean-${{ env.LEAN_VERSION }}-${{ hashFiles('lakefile.lean', 'lake-manifest.json') }}
+        restore-keys: |
+          ${{ runner.os }}-lean-${{ env.LEAN_VERSION }}-
+          
+    - name: Update Lake dependencies
+      run: lake update
+      
+    - name: Get mathlib4 cache
+      run: lake exe cache get || echo "Cache not available"
+      
+    - name: Run linter
+      run: |
+        # Build with all warnings
+        lake build --verbose
+        
+    - name: Check file headers
+      run: |
+        # Check that all .lean files have proper copyright headers
+        echo "Checking for copyright headers..."
+        missing_headers=()
+        for file in $(find FourierMukai -name "*.lean"); do
+          if ! head -10 "$file" | grep -q "Copyright"; then
+            missing_headers+=("$file")
+          fi
+        done
+        
+        if [ ${#missing_headers[@]} -ne 0 ]; then
+          echo "❌ Files missing copyright headers:"
+          printf '%s\n' "${missing_headers[@]}"
+          echo "Please add copyright headers to all .lean files"
+          exit 1
+        else
+          echo "✅ All files have copyright headers"
+        fi
+
+  documentation:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install elan
+      run: |
+        set -o pipefail
+        curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        ./elan-init -y --default-toolchain none
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
+        
+    - name: Get Lean version
+      run: echo "LEAN_VERSION=$(cat lean-toolchain)" >> $GITHUB_ENV
+        
+    - name: Cache Lean dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.elan
+          .lake
+        key: ${{ runner.os }}-lean-${{ env.LEAN_VERSION }}-${{ hashFiles('lakefile.lean', 'lake-manifest.json') }}
+        
+    - name: Update Lake dependencies
+      run: lake update
+      
+    - name: Get mathlib4 cache
+      run: lake exe cache get || echo "Cache not available"
+      
+    - name: Generate documentation
+      run: |
+        # Try to generate docs (this will be useful once you have more content)
+        echo "Checking documentation generation..."
+        lake build FourierMukai
+        
+    - name: Check for missing docstrings
+      run: |
+        # Simple check for public definitions without docstrings
+        echo "Checking for missing docstrings..."
+        
+        # This is a basic check - you might want to make it more sophisticated
+        missing_docs=()
+        for file in $(find FourierMukai -name "*.lean"); do
+          # Look for def/theorem/class/structure without preceding docstring
+          if grep -Pzo '(?<!\/\*\*[\s\S]*?\*\/\n)^(def|theorem|class|structure|instance)\s+[A-Z]' "$file" >/dev/null 2>&1; then
+            missing_docs+=("$file")
+          fi
+        done
+        
+        if [ ${#missing_docs[@]} -ne 0 ]; then
+          echo "⚠️  Files that may have missing docstrings:"
+          printf '%s\n' "${missing_docs[@]}"
+          echo "Please ensure all public definitions have docstrings"
+          # Don't fail for now, just warn
+        else
+          echo "✅ Documentation check passed"
+        fi
+
+  # Job to check that the project works with latest mathlib4
+  compatibility:
+    name: mathlib4 Compatibility
+    runs-on: ubuntu-latest
+    # Only run on main branch and PRs to avoid too much CI load
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install elan
+      run: |
+        set -o pipefail
+        curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        ./elan-init -y --default-toolchain none
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
+        
+    - name: Update to latest mathlib4
+      run: |
+        # Update mathlib4 to latest and see if project still builds
+        lake update Mathlib
+        
+    - name: Try building with latest mathlib4
+      run: |
+        lake exe cache get || echo "Cache not available for latest mathlib4"
+        lake build || echo "Build failed with latest mathlib4 - this is informational only"
+        
+  # Job that runs only on successful completion of all other jobs
+  success:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [build, lint, documentation]
+    if: success()
+    
+    steps:
+    - name: Success
+      run: |
+        echo "🎉 All CI checks passed!"
+        echo "✅ Build successful"
+        echo "✅ Linting passed" 
+        echo "✅ Documentation checks passed"
