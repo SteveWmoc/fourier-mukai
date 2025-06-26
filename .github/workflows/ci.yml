@@ -69,10 +69,10 @@ jobs:
     - name: Check for sorry's in main files
       run: |
         # Fail if sorry's are found in main source files (not in test or example files)
-        if find FourierMukai -name "*.lean" -exec grep -l "sorry" {} \; | grep -v -E "(test|example)" | head -1; then
+        FILES=$(find FourierMukai -name "*.lean" -exec grep -l "sorry" {} \; | grep -v -E "(test|example)" || true)
+        if [ -n "$FILES" ]; then
           echo "❌ Found sorry's in main source files:"
-          find FourierMukai -name "*.lean" -exec grep -l "sorry" {} \; | grep -v -E "(test|example)"
-          echo "Please resolve all sorry's before merging to main branch"
+          echo "$FILES"
           exit 1
         else
           echo "✅ No sorry's found in main source files"
