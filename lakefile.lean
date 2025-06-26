@@ -15,11 +15,7 @@ require mathlib from git
 
 -- Main library target
 @[default_target]
-lean_lib «FourierMukai» where
-  -- Source directory (default is the package name)
-  srcDir := "FourierMukai"
-  -- Build all .lean files in the directory
-  globs := #[.andSubmodules `FourierMukai]
+lean_lib FourierMukai
 
 -- Optional: Executable for examples/demos
 lean_exe «fourier-mukai-demo» where
