@@ -6,36 +6,27 @@ Authors: Steven Sabean
 /-
   FourierMukai.lean
   Main entry point for the Fourier–Mukai formalization project.
-
-  States the Fourier–Mukai equivalence theorem for derived categories of coherent sheaves on an elliptic curve.
 -/
 
--- Base field: algebraically closed
 import Mathlib.Algebra.Field.Defs
 import Mathlib.FieldTheory.IsAlgClosed.Basic
-
--- Elliptic curve (Weierstrass form)
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 
-open AlgebraicGeometry -- so WeierstrassCurve is in scope
+open AlgebraicGeometry.EllipticCurve
 
 section BaseField
 
 variable (k : Type*) [Field k] [IsAlgClosed k]
-
-/-- An elliptic curve over `k` (Weierstrass model with nonzero discriminant). -/
-structure EllipticCurveOver where
-  curve : WeierstrassCurve k
-  non_singular : curve.discriminant ≠ 0
-
-variable {k} (E : EllipticCurveOver k)
-
-end BaseField
+variable (E : WeierstrassCurve k) [E.IsElliptic]
 
 /-
-  TODO:
-  - Define the abelian category of coherent sheaves on E, `Coh(E)`
-  - Define the bounded derived category, `D^b(Coh(E))`
-  - Define the Poincaré bundle on E × E
-  - State and prove the Fourier–Mukai equivalence theorem
+  Now E is an elliptic curve over k in the Mathlib4 sense.
+
+  Next steps:
+    - Define Coh(E): the abelian category of coherent sheaves on E
+    - Define the bounded derived category D^b(Coh(E))
+    - Define the Poincaré bundle on E × E
+    - State and eventually prove the Fourier–Mukai equivalence theorem
 -/
+
+end BaseField
