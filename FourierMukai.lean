@@ -7,32 +7,30 @@ Authors: Steven Sabean
   FourierMukai.lean
   Main entry point for the Fourier–Mukai formalization project.
 
-  This file will state (and eventually prove) the Fourier–Mukai equivalence theorem
-  for the derived category of coherent sheaves on an elliptic curve over an algebraically closed field.
+  States the Fourier–Mukai equivalence theorem for derived categories of coherent sheaves on an elliptic curve.
 -/
 
 -- Base field: algebraically closed
 import Mathlib.Algebra.Field.Defs
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 
--- Elliptic curve structures (Weierstrass form and group law)
+-- Elliptic curve (Weierstrass form)
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
-import Mathlib.AlgebraicGeometry.EllipticCurve.Group
 
--- For future use: coherent sheaves, derived categories, and functors
--- (To be added as we expand functionality)
+open AlgebraicGeometry -- so WeierstrassCurve is in scope
 
-open scoped Classical
+section BaseField
 
-/-- Let `k` be an algebraically closed field. -/
 variable (k : Type*) [Field k] [IsAlgClosed k]
 
-/-- Let `E` be an elliptic curve over `k`. -/
-structure EllipticCurveOver :=
-  (curve : AlgebraicGeometry.WeierstrassCurve k)
-  (non_singular : curve.Discriminant ≠ 0)
+/-- An elliptic curve over `k` (Weierstrass model with nonzero discriminant). -/
+structure EllipticCurveOver where
+  curve : WeierstrassCurve k
+  non_singular : curve.discriminant ≠ 0
 
-variable (E : EllipticCurveOver k)
+variable {k} (E : EllipticCurveOver k)
+
+end BaseField
 
 /-
   TODO:
