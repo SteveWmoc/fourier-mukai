@@ -15,7 +15,7 @@ import Mathlib.AlgebraicGeometry.WeierstrassCurve
 section BaseField
 
 variable (k : Type*) [Field k] [IsAlgClosed k]
-variable (E : AlgebraicGeometry.WeierstrassCurve k) [E.IsElliptic]
+variable (E : WeierstrassCurve k) [E.IsElliptic]
 
 /-
   Now E is an elliptic curve over k in the Mathlib4 sense.
