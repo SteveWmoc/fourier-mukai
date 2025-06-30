@@ -10,7 +10,7 @@ Authors: Steven Sabean
 
 import Mathlib.Algebra.Field.Defs
 import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.AlgebraicGeometry.WeierstrassCurve
+import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 
 section BaseField
 
