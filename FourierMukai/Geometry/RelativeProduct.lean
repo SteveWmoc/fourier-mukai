@@ -44,12 +44,14 @@ def lift (a : T ⟶ X) (b : T ⟶ Y) (h : a ≫ f = b ≫ g) : T ⟶ obj f g :=
 @[simp, reassoc]
 lemma lift_p₁ (a : T ⟶ X) (b : T ⟶ Y) (h : a ≫ f = b ≫ g) :
     lift f g a b h ≫ p₁ f g = a := by
-  simp [lift]
+  change pullback.lift a b h ≫ pullback.fst f g = a
+  exact pullback.lift_fst a b h
 
 @[simp, reassoc]
 lemma lift_p₂ (a : T ⟶ X) (b : T ⟶ Y) (h : a ≫ f = b ≫ g) :
     lift f g a b h ≫ p₂ f g = b := by
-  simp [lift]
+  change pullback.lift a b h ≫ pullback.snd f g = b
+  exact pullback.lift_snd a b h
 
 /-- Maps into a relative product are determined by their composites with the two projections. -/
 @[ext]
