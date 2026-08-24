@@ -36,10 +36,13 @@ the presheaf of commutative rings, which this abbreviation records.
 abbrev MonoidalPresheaves :=
   PresheafOfModules.{u} (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat)
 
-local instance : MonoidalCategoryStruct X.PresheafOfModules :=
+/-- The pointwise tensor structure on presheaves of modules over a scheme. -/
+local instance monoidalCategoryStructPresheafOfModules :
+    MonoidalCategoryStruct X.PresheafOfModules :=
   PresheafOfModules.monoidalCategoryStruct (R := X.sheaf.obj)
 
-local instance : MonoidalCategory X.PresheafOfModules :=
+/-- The pointwise monoidal category structure on presheaves of modules over a scheme. -/
+local instance monoidalCategoryPresheafOfModules : MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.sheaf.obj)
 
 /-- Pointwise tensoring of presheaves of modules by a fixed presheaf. -/

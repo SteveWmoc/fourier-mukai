@@ -1,6 +1,7 @@
 name = "fourier-mukai"
 version = "0.1.0"
 defaultTargets = ["FourierMukai"]
+lintDriver = "batteries/runLinter"
 
 [[lean_lib]]
 name = "FourierMukai"
