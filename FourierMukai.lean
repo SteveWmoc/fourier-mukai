@@ -1,3 +1,5 @@
 import FourierMukai.MathlibAudit
 import FourierMukai.Geometry.RelativeProduct
 import FourierMukai.Geometry.ProjectionFunctors
+import FourierMukai.Sheaves.Tensor
+import FourierMukai.Transform.Underived

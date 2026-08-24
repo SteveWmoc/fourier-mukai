@@ -1,4 +1,7 @@
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
+import Mathlib.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
+import Mathlib.Algebra.Category.ModuleCat.Presheaf.Monoidal
+import Mathlib.Algebra.Category.ModuleCat.Presheaf.Sheafification
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Quasicoherent
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackContinuous
 import Mathlib.AlgebraicGeometry.Pullbacks
@@ -21,5 +24,8 @@ namespace FourierMukai.MathlibAudit
 #check CategoryTheory.Limits.pullback.snd
 #check SheafOfModules
 #check SheafOfModules.pullback
+#check PresheafOfModules.sheafification
+#check PresheafOfModules.Monoidal.tensorObj
+#check CategoryTheory.Functor.rightDerivedFunctorPlus
 
 end FourierMukai.MathlibAudit

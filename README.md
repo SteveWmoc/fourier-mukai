@@ -14,9 +14,19 @@ The guiding formula is
 
 The first long-term target is the Fourier–Mukai transform for elliptic curves. Generic infrastructure should be introduced only when a concrete theorem requires it.
 
-## Current milestone
+## Current status
 
-Establish the minimal Mathlib interface required for an integral transform. See Issue #1.
+The repository now has a compile-tested relative product `X ×[S] Y`, its projections,
+pullback and pushforward on sheaves of modules, sheafified tensoring by a fixed kernel, and the
+generic underived transform
+
+\[
+M \longmapsto p_{2*}\bigl(p_1^*M \otimes K\bigr).
+\]
+
+The next milestone is the derived upgrade: isolate the exactness and quasi-coherence hypotheses
+needed to construct `R p₂* (L p₁* (-) ⊗ᴸ K)`. See
+[`docs/CAPABILITY_MAP.md`](docs/CAPABILITY_MAP.md) for the live boundary map.
 
 ## Build
 

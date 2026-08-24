@@ -8,7 +8,7 @@ For a relative product `X ×[S] Y`, this file gives stable project-level names t
 pullback and pushforward functors attached to the two projections. These are the functorial
 ingredients appearing in an underived integral transform:
 
-`F ↦ p₂* (p₁* F ⊗ K)`.
+`F ↦ p₂* (p₁^* F ⊗ K)`.
 
 Tensoring with a kernel is deliberately left to a later layer.
 -/
@@ -60,6 +60,22 @@ instance : (pullback₂ f g).IsLeftAdjoint :=
 
 instance : (pushforward₂ f g).IsRightAdjoint :=
   (pullback₂Pushforward₂Adjunction f g).isRightAdjoint
+
+instance : (pullback₁ f g).Additive := by
+  dsimp [pullback₁]
+  infer_instance
+
+instance : (pushforward₁ f g).Additive := by
+  dsimp [pushforward₁]
+  infer_instance
+
+instance : (pullback₂ f g).Additive := by
+  dsimp [pullback₂]
+  infer_instance
+
+instance : (pushforward₂ f g).Additive := by
+  dsimp [pushforward₂]
+  infer_instance
 
 end RelativeProduct
 
