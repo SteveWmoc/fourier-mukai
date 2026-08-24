@@ -16,4 +16,5 @@ jobs:
         with:
           build: true
           build-args: "--wfail"
+          lint: true
           use-mathlib-cache: true

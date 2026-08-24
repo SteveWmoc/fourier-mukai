@@ -8,9 +8,9 @@ The project is deliberately incremental. Before introducing project-specific abs
 
 The guiding formula is
 
-\[
+$$
 \Phi_{\mathcal P}(-) = R p_{2*}\bigl(p_1^*(-) \otimes \mathcal P\bigr).
-\]
+$$
 
 The first long-term target is the Fourier–Mukai transform for elliptic curves. Generic infrastructure should be introduced only when a concrete theorem requires it.
 
@@ -20,9 +20,9 @@ The repository now has a compile-tested relative product `X ×[S] Y`, its projec
 pullback and pushforward on sheaves of modules, sheafified tensoring by a fixed kernel, and the
 generic underived transform
 
-\[
+$$
 M \longmapsto p_{2*}\bigl(p_1^*M \otimes K\bigr).
-\]
+$$
 
 The next milestone is the derived upgrade: isolate the exactness and quasi-coherence hypotheses
 needed to construct `R p₂* (L p₁* (-) ⊗ᴸ K)`. See
@@ -34,6 +34,7 @@ needed to construct `R p₂* (L p₁* (-) ⊗ᴸ K)`. See
 lake update
 lake exe cache get
 lake build
+lake lint
 ```
 
 The project pins a stable Mathlib release so that CI and local development use the same Lean/Mathlib pair.
